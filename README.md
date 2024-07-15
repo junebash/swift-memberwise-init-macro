@@ -26,6 +26,7 @@ Informed by explicit developer cues, MemberwiseInit can more often automatically
   * [Attributed properties are ignored by default, but includable](#attributed-properties-are-ignored-by-default-but-includable)
   * [Support for property wrappers](#support-for-property-wrappers)
   * [Automatic `@escaping` for closure types (usually)](#automatic-escaping-for-closure-types-usually)
+  * [Experimental: Unchecked memberwise initialization](#experimental-unchecked-memberwise-initialization)
   * [Experimental: Deunderscore parameter names](#experimental-deunderscore-parameter-names)
   * [Experimental: Defaulting optionals to nil](#experimental-defaulting-optionals-to-nil)
   * [Tuple destructuring in property declarations isn’t supported (yet)](#tuple-destructuring-in-property-declarations-isnt-supported-yet)
@@ -45,7 +46,7 @@ To use MemberwiseInit:
 
    ```swift
    dependencies: [
-     .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", from: "0.4.0")
+     .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", from: "0.5.0")
    ]
    ```
 
@@ -175,6 +176,9 @@ Attach to the property declarations of a struct that `@MemberwiseInit` is provid
 
 * `@MemberwiseInit` on  `actor`, `class` *(experimental)*
   <br> Attachable to actor and class.
+
+* `@_UncheckedMemberwiseInit`  *(experimental)*
+  <br> Generate a memberwise initializer with reduced safety checks compared to `@MemberwiseInit`.
 
 ## Features and limitations
 
@@ -598,6 +602,31 @@ public init(
 }
 ```
 
+### Experimental: Unchecked memberwise initialization
+
+`@_UncheckedMemberwiseInit` is an experimental macro that provides a trade-off between ease of use and compile-time safety, suitable for scenarios where brevity is preferred over strict access control enforcement.
+
+Features of `@_UncheckedMemberwiseInit`:
+- Includes all properties in the initializer, regardless of access level and without requiring per-member annotation
+- Includes attributed properties by default (differs from `@MemberwiseInit`)
+- Has the same usage as `@MemberwiseInit`
+
+Example:
+
+```swift
+@_UncheckedMemberwiseInit(.public)  // 👈 Public initializer
+public struct ViewModel {
+  private let title: String  // 👈 Private property
+}
+```
+
+Yields:
+
+```swift
+public init(title: String) {  // 👈 Private property publicly exposed
+  self.title = title
+}
+```
 ### Experimental: Deunderscore parameter names
 
 > **Note**
